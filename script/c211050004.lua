@@ -26,9 +26,26 @@ function s.initial_effect(c)
     e2:SetTarget(s.xyztg)
     e2:SetOperation(s.xyzop)
     c:RegisterEffect(e2)
+    aux.GlobalCheck(s,function()
+		local e0a=Effect.CreateEffect(c)
+		e0a:SetType(EFFECT_TYPE_FIELD)
+		e0a:SetCode(EFFECT_CHANGE_LEVEL)
+		e0a:SetTargetRange(LOCATION_HAND+LOCATION_MZONE,0)
+		e0a:SetTarget(function(e,c) local tp=e:GetHandlerPlayer() return c:IsMonster() and c:IsSetCard(0x3b) end)
+		e0a:SetOperation(s.chngcon)
+		e0a:SetValue(7)
+		Duel.RegisterEffect(e0a,0)
+		local e0b=e0a:Clone()
+        e0b:SetCode(EFFECT_ADD_RACE)
+        e0b:SetValue(RACE_DRAGON)
+		Duel.RegisterEffect(e0b,1)
+	end)
     Duel.AddCustomActivityCounter(id,ACTIVITY_SPSUMMON,s.counterfilter)
 end
 s.listed_series={0x3b}
+function s.chngcon(scard,sumtype,tp)
+	return Xyz.SummonEffect and Xyz.SummonEffect:GetHandler():IsCode(id) and ((sumtype&MATERIAL_XYZ)~=0 or (sumtype&SUMMON_TYPE_XYZ)~=0)
+end
 function s.counterfilter(c)
 	return c:GetSummonLocation()~=LOCATION_EXTRA or (c:IsType(TYPE_FUSION) or c:IsType(TYPE_XYZ))
 end
@@ -100,8 +117,9 @@ function s.xyztg(e,tp,eg,ep,ev,re,r,rp,chk)
     if chk==0 then
         local c=e:GetHandler()
         if not c:IsFaceup() then return false end
-        local g=Duel.GetMatchingGroup(s.xyzfilter,tp,LOCATION_HAND+LOCATION_MZONE,0,nil,e,tp)
+        local g=Duel.GetMatchingGroup(s.xyzfilter,tp,LOCATION_HAND+LOCATION_MZONE,0,c,e,tp)
         for tc in g:Iter() do
+            
             -- Simulate override: treat as Level 7 DARK Dragon
             local matg=Group.FromCards(c,tc)
             local xyzg=Duel.GetMatchingGroup(function(xc)
