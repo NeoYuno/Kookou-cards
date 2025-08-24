@@ -15,23 +15,21 @@ function s.initial_effect(c)
     e1:SetTarget(s.sptg)
     e1:SetOperation(s.spop)
     c:RegisterEffect(e1)
-    -- On Special Summon: Immediate Xyz Summon
+    -- Quick Effect: Immediately Xyz Summon
     local e2=Effect.CreateEffect(c)
     e2:SetDescription(aux.Stringid(id,1))
-    e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-    e2:SetCode(EVENT_SPSUMMON_SUCCESS)
-    e2:SetProperty(EFFECT_FLAG_DELAY)
+    e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
+    e2:SetType(EFFECT_TYPE_QUICK_O)
+    e2:SetCode(EVENT_FREE_CHAIN)
+    e2:SetRange(LOCATION_MZONE)
+    e2:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_MAIN_END)
     e2:SetCountLimit(1,{id,1})
-    e2:SetCost(s.xyzcost)
     e2:SetTarget(s.xyztg)
     e2:SetOperation(s.xyzop)
     c:RegisterEffect(e2)
     Duel.AddCustomActivityCounter(id,ACTIVITY_SPSUMMON,s.counterfilter)
 end
 s.listed_series={0x3b}
-function s.chngcon(scard,sumtype,tp)
-	return Xyz.SummonEffect and Xyz.SummonEffect:GetHandler():IsCode(id) and ((sumtype&MATERIAL_XYZ)~=0 or (sumtype&SUMMON_TYPE_XYZ)~=0)
-end
 function s.counterfilter(c)
 	return c:GetSummonLocation()~=LOCATION_EXTRA or (c:IsType(TYPE_FUSION) or c:IsType(TYPE_XYZ))
 end
@@ -95,48 +93,25 @@ function s.xyzcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e2:SetTargetRange(1,0)
 	Duel.RegisterEffect(e2,tp)
 end
-function s.xyzfilter(c,e,tp)
+
+function s.xyzfilter(c)
     return c:IsSetCard(0x3b) and c:IsType(TYPE_MONSTER)
-        and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
+
 function s.xyztg(e,tp,eg,ep,ev,re,r,rp,chk)
     if chk==0 then
-        local c=e:GetHandler()
-        if not c:IsFaceup() then return false end
-        local g=Duel.GetMatchingGroup(s.xyzfilter,tp,LOCATION_HAND+LOCATION_MZONE,0,c,e,tp)
-        for tc in g:Iter() do
-            -- Level becomes 7
-            local e1=Effect.CreateEffect(c)
-            e1:SetType(EFFECT_TYPE_SINGLE)
-            e1:SetCode(EFFECT_CHANGE_LEVEL)
-            e1:SetValue(7)
-            e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-            tc:RegisterEffect(e1)
-            -- Treated as Dragon (add Dragon Race)
-            local e2=Effect.CreateEffect(c)
-            e2:SetType(EFFECT_TYPE_SINGLE)
-            e2:SetCode(EFFECT_ADD_RACE)
-            e2:SetValue(RACE_DRAGON)
-            e2:SetReset(RESET_EVENT+RESETS_STANDARD)
-            tc:RegisterEffect(e2)
-            -- Simulate override: treat as Level 7 DARK Dragon
-            local matg=Group.FromCards(c,tc)
-            local xyzg=Duel.GetMatchingGroup(function(xc)
-                return xc:IsSetCard(0x3b) and xc:IsType(TYPE_XYZ) and xc:IsXyzSummonable(nil,matg)
-            end,tp,LOCATION_EXTRA,0,nil)
-            if #xyzg>0 then return true end
-        end
-        return false
+        return Duel.IsExistingMatchingCard(s.xyzfilter,tp,LOCATION_HAND+LOCATION_MZONE,0,1,e:GetHandler())
+            and Duel.IsExistingMatchingCard(function(c) return c:IsSetCard(0x3b) and c:IsType(TYPE_XYZ) end,tp,LOCATION_EXTRA,0,1,nil)
     end
+    Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
 function s.xyzop(e,tp,eg,ep,ev,re,r,rp)
     local c=e:GetHandler()
-    if not c:IsRelateToEffect(e) or not c:IsFaceup() then return end
     Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONFIRM)
-    local g=Duel.SelectMatchingCard(tp,s.xyzfilter,tp,LOCATION_HAND+LOCATION_MZONE,0,1,1,nil,e,tp)
+    local g=Duel.SelectMatchingCard(tp,s.xyzfilter,tp,LOCATION_HAND+LOCATION_MZONE,0,1,1,c)
     local tc=g:GetFirst()
-    if not tc then return end
-    -- Temporarily treat tc as Level 7 DARK Dragon
+    if not tc or not c:IsRelateToEffect(e) then return end
+    -- Apply temporary overrides
     local e1=Effect.CreateEffect(c)
     e1:SetType(EFFECT_TYPE_SINGLE)
     e1:SetCode(EFFECT_CHANGE_LEVEL)
@@ -149,19 +124,21 @@ function s.xyzop(e,tp,eg,ep,ev,re,r,rp)
     e2:SetValue(RACE_DRAGON)
     e2:SetReset(RESET_EVENT+RESETS_STANDARD)
     tc:RegisterEffect(e2)
-    local e2=Effect.CreateEffect(c)
-    e2:SetType(EFFECT_TYPE_SINGLE)
-    e2:SetCode(EFFECT_CHANGE_ATTRIBUTE)
-    e2:SetValue(ATTRIBUTE_DARK)
-    e2:SetReset(RESET_EVENT+RESETS_STANDARD)
-    tc:RegisterEffect(e2)
+    local e3=Effect.CreateEffect(c)
+    e3:SetType(EFFECT_TYPE_SINGLE)
+    e3:SetCode(EFFECT_CHANGE_ATTRIBUTE)
+    e3:SetValue(ATTRIBUTE_DARK)
+    e3:SetReset(RESET_EVENT+RESETS_STANDARD)
+    tc:RegisterEffect(e3)
+    -- Now validate summon
+    local matg=Group.FromCards(c,tc)
     local xyzg=Duel.GetMatchingGroup(function(xc)
-        return xc:IsSetCard(0x3b) and xc:IsType(TYPE_XYZ) and xc:IsXyzSummonable(nil,Group.FromCards(c,tc))
+        return xc:IsSetCard(0x3b) and xc:IsType(TYPE_XYZ) and xc:IsXyzSummonable(nil,matg)
     end,tp,LOCATION_EXTRA,0,nil)
     if #xyzg>0 then
         Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
         local xyz=xyzg:Select(tp,1,1,nil):GetFirst()
-        Duel.XyzSummon(tp,xyz,nil,Group.FromCards(c,tc))
+        Duel.XyzSummon(tp,xyz,nil,matg)
     end
 end
 
