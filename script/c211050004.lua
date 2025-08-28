@@ -33,15 +33,16 @@ s.listed_series={0x3b}
 function s.counterfilter(c)
 	return c:GetSummonLocation()~=LOCATION_EXTRA or (c:IsType(TYPE_FUSION) or c:IsType(TYPE_XYZ))
 end
-function s.spcon(e,tp)
-    return Duel.IsMainPhase()
+function s.filter(c)
+	return c:IsFaceup() and c:IsSetCard(0x3b)
+end
+function s.spcon(e,tp,eg,ep,ev,re,r,rp)
+    if not Duel.IsMainPhase() then return false end
+    return Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0
+        or Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_MZONE,0,1,nil)
 end
 function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_HAND+LOCATION_MZONE+LOCATION_GRAVE,0,1,e:GetHandler())
-        and Duel.GetCustomActivityCount(id,tp,ACTIVITY_SPSUMMON)==0 end
-    Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-    local g=Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_HAND+LOCATION_MZONE+LOCATION_GRAVE,0,1,1,e:GetHandler())
-    Duel.Remove(g,POS_FACEUP,REASON_COST)
+	if chk==0 then return Duel.GetCustomActivityCount(id,tp,ACTIVITY_SPSUMMON)==0 end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
