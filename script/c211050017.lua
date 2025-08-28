@@ -115,12 +115,5 @@ function s.spop2(e,tp,eg,ep,ev,re,r,rp,chk)
 		e2:SetCode(EFFECT_DISABLE_EFFECT)
 		e2:SetReset(RESET_EVENT|RESETS_STANDARD)
 		tc:RegisterEffect(e2,true)
-		local e3=Effect.CreateEffect(e:GetHandler())
-		e3:SetType(EFFECT_TYPE_SINGLE)
-		e3:SetCode(EFFECT_CANNOT_BE_SYNCHRO_MATERIAL)
-		e3:SetProperty(EFFECT_FLAG_UNCOPYABLE)
-		e3:SetValue(1)
-		e3:SetReset(RESET_EVENT|RESETS_STANDARD)
-		tc:RegisterEffect(e3,true)
 	end
 end
