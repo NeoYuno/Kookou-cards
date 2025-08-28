@@ -2,7 +2,10 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
-	Synchro.AddProcedure(c,s.attfilter,1,1,Synchro.NonTunerEx(s.attfilter),1,1)
+	local f0=Synchro.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsAttribute,ATTRIBUTE_DARK),1,1,Synchro.NonTunerEx(Card.IsAttribute,ATTRIBUTE_LIGHT),1,1)
+	f0:SetDescription(aux.Stringid(id,4))
+	local f1=Synchro.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsAttribute,ATTRIBUTE_LIGHT),1,1,Synchro.NonTunerEx(Card.IsAttribute,ATTRIBUTE_DARK),1,1)
+	f1:SetDescription(aux.Stringid(id,5))
     --This card is also LIGHT
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
