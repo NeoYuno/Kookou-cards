@@ -29,7 +29,7 @@ function s.initial_effect(c)
 	e3:SetOperation(s.spop)
 	c:RegisterEffect(e3)
 end
-
+s.listed_card_types={TYPE_GEMINI}
 function s.boostfilter(e,c)
 	return c:IsType(TYPE_NORMAL) or c:IsType(TYPE_GEMINI)
 end

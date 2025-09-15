@@ -35,7 +35,7 @@ function s.initial_effect(c)
 	e1:SetOperation(s.negop)
 	c:RegisterEffect(e1)
 end
-
+s.listed_card_types={TYPE_GEMINI}
 -- Check if you control a Gemini
 function s.handcon(e)
 	return Duel.IsExistingMatchingCard(Card.IsType,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil,TYPE_GEMINI)

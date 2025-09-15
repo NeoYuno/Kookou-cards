@@ -23,7 +23,7 @@ function s.initial_effect(c)
 	e2:SetOperation(s.nsop)
 	c:RegisterEffect(e2)
 end
-
+s.listed_card_types={TYPE_GEMINI}
 function s.filter(c)
     return c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsRace(RACE_DRAGON)
 end
