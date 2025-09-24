@@ -23,7 +23,7 @@ function s.initial_effect(c)
     e4:SetCode(EVENT_FLIP_SUMMON_SUCCESS)
     c:RegisterEffect(e4)
 end
-s.listed_names={211050055}
+s.listed_names={211050055,211050054}
 
 function s.ritualfil(c)
 	return c:IsRace(RACE_FIEND) and c:IsRitualMonster()

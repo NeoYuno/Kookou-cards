@@ -81,6 +81,7 @@ function s.cfilter(c)
 	return c:IsRace(RACE_FIEND) and c:IsAbleToRemoveAsCost()
 end
 function s.gycost(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
 	if chk==0 then 
 		return e:GetHandler():IsAbleToRemoveAsCost()
 			and Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_GRAVE,0,1,e:GetHandler())
@@ -108,13 +109,9 @@ function s.gycost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.RegisterEffect(e1,tp)
 end
 function s.gytg(e,tp,eg,ep,ev,re,r,rp,chk)
-    local atk=e:GetLabel()
-	if chk==0 then
-        local g=Duel.GetMatchingGroup(aux.TRUE,tp,0,LOCATION_MZONE,nil)
-        local dg=g:Filter(function(c) return c:IsFaceup() and c:GetAttack()<atk end,nil)
-        return #dg>0
-    end
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,dg,#dg,0,0)
+	local g=Duel.GetMatchingGroup(aux.TRUE,tp,0,LOCATION_MZONE,nil)
+	if chk==0 then return #g>0 end
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,#g,0,0)
 end
 function s.gyop(e,tp,eg,ep,ev,re,r,rp)
 	local atk=e:GetLabel()
