@@ -15,6 +15,7 @@ function s.initial_effect(c)
     e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
     e1:SetRange(LOCATION_FZONE)
     e1:SetTargetRange(LOCATION_ONFIELD,0)
+    e1:SetCondition(s.protcon)
     e1:SetTarget(s.prottg)
     e1:SetValue(1)
     c:RegisterEffect(e1)
@@ -46,8 +47,11 @@ function s.initial_effect(c)
 end
 s.listed_series={0xd3}
 s.counter_list={COUNTER_KAIJU}
+function s.protcon(e)
+    return Duel.IsExistingMatchingCard(function(tc) return tc:GetCounter(COUNTER_KAIJU)>0 end,e:GetHandlerPlayer(),LOCATION_ONFIELD,0,1,nil)
+end
 function s.prottg(e,c)
-    return c:GetCounter(COUNTER_KAIJU)>0 and c:IsControler(e:GetHandlerPlayer())
+    return c:IsFaceup() and c:IsSetCard(0xd3)
 end
 
 function s.cttg(e,tp,eg,ep,ev,re,r,rp,chk)
