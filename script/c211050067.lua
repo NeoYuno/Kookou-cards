@@ -51,7 +51,7 @@ function s.protcon(e)
     return Duel.IsExistingMatchingCard(function(tc) return tc:GetCounter(COUNTER_KAIJU)>0 end,e:GetHandlerPlayer(),LOCATION_ONFIELD,0,1,nil)
 end
 function s.prottg(e,c)
-    return c:IsFaceup() and c:IsSetCard(0xd3)
+    return c:IsFaceup() and c:IsSetCard(0xd3) or c:IsCode(211050066)
 end
 
 function s.cttg(e,tp,eg,ep,ev,re,r,rp,chk)
