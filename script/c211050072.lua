@@ -37,7 +37,7 @@ end
 s.listed_series={SET_FORBIDDEN_ONE,SET_EXODD}
 
 function s.forbidden_filter(c)
-	return c:IsMonster() and c:IsSetCard(SET_FORBIDDEN_ONE) and c:IsAbleToDeckAsCost()
+	return c:IsMonster() and c:IsSetCard(SET_FORBIDDEN_ONE) and c:IsAbleToDeckOrExtraAsCost()
 end
 
 function s.spcon(e,c)
