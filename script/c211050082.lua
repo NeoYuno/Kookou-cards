@@ -41,7 +41,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function s.mfilter(c,lc,sumtype,tp)
-	return c:IsRace(RACE_FIEND,lc,sumtype,tp) and c:IsAttribute(ATTRIBUTE_DARK,lc,sumtype,tp)
+	return c:IsRace(RACE_FIEND,lc,sumtype,tp)
 end
 function s.protcon(e)
 	local c=e:GetHandler()

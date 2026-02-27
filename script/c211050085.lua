@@ -13,16 +13,6 @@ function s.initial_effect(c)
 	e1:SetOperation(s.rmop)
 	e1:SetCountLimit(1,id)
 	c:RegisterEffect(e1)
-	--------------------------------------------------
-	-- Cannot be banished except by Destiny Board
-	--------------------------------------------------
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_SINGLE)
-	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e2:SetRange(LOCATION_ALL)
-	e2:SetCode(EFFECT_CANNOT_REMOVE)
-	e2:SetValue(s.remval)
-	c:RegisterEffect(e2)
 end
 s.listed_names={94212438}
 function s.gyfilter(c)
@@ -63,12 +53,4 @@ function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 	if #g>0 then
 		Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
 	end
-end
-
---------------------------------------------------
--- Cannot be banished except by Destiny Board
---------------------------------------------------
-function s.remval(e,re,r,rp)
-	if not re then return true end
-	return not re:GetHandler():IsCode(94212438) -- Destiny Board ID
 end
