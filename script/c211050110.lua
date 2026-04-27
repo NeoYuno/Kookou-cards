@@ -80,7 +80,7 @@ end
 function s.cfilter(c)
     return c:IsLevelAbove(8)
     and c:IsType(TYPE_SYNCHRO)
-    and c:IsAbleToDeckAsCost()
+    and c:IsAbleToExtraAsCost()
 end
 
 function s.tdcost(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -107,12 +107,9 @@ function s.tdfilter(c)
 end
 
 function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	local g=Duel.GetMatchingGroup(Card.IsAbleToDeck,tp,0,LOCATION_ONFIELD+LOCATION_GRAVE,nil)
-	if #g>0 then
-		Duel.SetOperationInfo(0,CATEGORY_TODECK,g,1,0,0)
-	end
-	Duel.SetChainLimit(aux.FALSE)
+    local g=Duel.GetMatchingGroup(Card.IsAbleToDeck,tp,0,LOCATION_ONFIELD+LOCATION_GRAVE,nil)
+	if chk==0 then return #g>0 end
+	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,1,0,0)
 end
 function s.tdop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)

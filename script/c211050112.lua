@@ -83,48 +83,61 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 
 
-function s.tunerfilter(c)
-    return c:IsType(TYPE_TUNER)
+function s.tunercheck(g)
+    return g:IsExists(Card.IsType,1,nil,TYPE_TUNER)
 end
-
 
 function s.spop(e,tp)
 
     local mg=Duel.GetMatchingGroup(
-      Card.IsMonster,tp,
-      LOCATION_GRAVE,LOCATION_GRAVE,nil)
+        Card.IsMonster,
+        tp,
+        LOCATION_GRAVE,LOCATION_GRAVE,
+        nil
+    ):Filter(Card.IsLevelAbove,nil,1)
 
     Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 
     local ex=Duel.SelectMatchingCard(
-      tp,s.spfilter,tp,
-      LOCATION_EXTRA,0,1,1,nil,e,tp,mg)
+        tp,s.spfilter,
+        tp,LOCATION_EXTRA,0,
+        1,1,nil,e,tp,mg)
 
     local sc=ex:GetFirst()
     if not sc then return end
 
     local lv=sc:GetLevel()
 
-    local g=nil
+    --Must have exact level combination
+    if not mg:CheckWithSumEqual(
+        Card.GetLevel,lv,2,99) then
+        return
+    end
 
+    local g
     repeat
-      Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-      g=aux.SelectUnselectGroup(
-          mg,e,tp,2,99,
-          function(sel)
-            return sel:IsExists(s.tunerfilter,1,nil)
-             and sel:CheckWithSumEqual(Card.GetLevel,lv,#sel,#sel)
-          end,
-          1,tp,HINTMSG_TODECK)
-    until g
+        Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 
-    Duel.SendtoDeck(g,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
+        g=mg:SelectWithSumEqual(
+            tp,
+            Card.GetLevel,
+            lv,
+            2,99
+        )
 
-    Duel.SpecialSummon(
-      sc,SUMMON_TYPE_SYNCHRO,
-      tp,tp,false,false,POS_FACEUP)
+    until #g==0 or s.tunercheck(g)
 
-    sc:CompleteProcedure()
+    if #g==0 then return end
+
+    Duel.SendtoDeck(
+        g,nil,SEQ_DECKSHUFFLE,REASON_EFFECT
+    )
+
+    if Duel.SpecialSummon(
+        sc,SUMMON_TYPE_SYNCHRO,
+        tp,tp,false,false,POS_FACEUP)>0 then
+        sc:CompleteProcedure()
+    end
 end
 
 
