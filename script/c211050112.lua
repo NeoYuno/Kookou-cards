@@ -35,7 +35,7 @@ function s.initial_effect(c)
     c:RegisterEffect(e2)
 
 end
-
+s.listed_names={44508096,63436931}
 
 --Control Crimson Dragon or Stardust monster
 function s.handfilter(c)
