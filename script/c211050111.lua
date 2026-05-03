@@ -42,6 +42,7 @@ function s.negcon(e,tp,eg,ep,ev,re,r,rp)
         or re:IsHasCategory(CATEGORY_DESTROY)
         or re:IsHasCategory(CATEGORY_REMOVE)
         or re:IsHasCategory(CATEGORY_NEGATE)
+        or re:IsHasCategory(CATEGORY_DISABLE)
 end
 
 
@@ -57,7 +58,7 @@ end
 
 function s.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
     if chk==0 then
-        return Duel.GetLocationCountFromEx(tp)>0
+        return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
         and Duel.IsExistingMatchingCard(
             s.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp
         )
@@ -76,7 +77,7 @@ function s.negop(e,tp,eg,ep,ev,re,r,rp)
 
     if not Duel.NegateActivation(ev) then return end
 
-    if Duel.GetLocationCountFromEx(tp)<=0 then return end
+    if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
     if not c:IsRelateToEffect(e) then return end
 
     Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
